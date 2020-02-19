@@ -1,5 +1,6 @@
 package br.com.anderson.service;
 
+import java.io.StringReader;
 import java.util.ArrayList;
 
 import javax.ws.rs.Consumes;
@@ -15,10 +16,16 @@ import javax.ws.rs.core.Response;
 
 import com.google.gson.Gson;
 
+
 import br.com.anderson.model.Employee;
 import br.com.anderson.model.Employees;
 import br.com.anderson.model.Staff;
 import br.com.anderson.util.Configuration;
+import br.com.anderson.util.XmlUtils;
+
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
 
 @Path("/api")
 public class EmployeeService {
@@ -33,7 +40,7 @@ public class EmployeeService {
 	@Path("/mock")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Staff getAllEmployeesMock() 
+	public Staff getStaffMock() throws JAXBException 
 	{
 	    //Obtendo o endereço do Mock Service no arquivo anderson.properties
 		String url = URL_MOCK;
@@ -46,6 +53,23 @@ public class EmployeeService {
 		
 		// atribuindo os dados do response do mock para uma classe
 		Staff staf = response.readEntity(Staff.class);
+		
+		//Converter Objeto para XML
+		System.out.println(XmlUtils.getXMLValue(staf));
+		
+		//Converter XML para JAVA
+		Staff staf2 = (Staff) XmlUtils.getObjectValue(XmlUtils.getXMLValue(staf), Staff.class);
+	    System.out.println(staf2);
+		
+		//Converte objetos Java para JSON
+		Gson gson = new Gson();
+		String json = gson.toJson(staf); 
+		System.out.println(json);
+		
+		//Converte JSON para objeto Java
+		Staff staf3 = gson.fromJson(json, Staff.class);		
+		System.out.println(staf3.toString());
+		
 		return staf;
 	}
 	
